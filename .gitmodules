@@ -1,0 +1,3 @@
+[submodule "autocheck"]
+	path = autocheck
+	url = git@github.com:dlgd/autocheck.git

@@ -26,12 +26,12 @@ static std::size_t components_count(std::ifstream& ifs)
 
 TEST(union_find, init)   
 {
-   const std::size_t N = 5;
+   const size_t N = 5;
    ds::union_find uf(N);
 
    EXPECT_EQ(N, uf.count());
 
-   for (int i = 0; i < N; ++i) 
+   for (int i = 0; i < static_cast<int>(N); ++i) 
    {
       EXPECT_EQ(i, uf.find(i));
    }
@@ -42,7 +42,7 @@ TEST(union_find, one_connection)
    ds::union_find uf(2);
 
    uf.connect(0, 1);
-   EXPECT_EQ(1, uf.count());
+   EXPECT_EQ(1u, uf.count());
    EXPECT_EQ(uf.find(0), uf.find(1));
    EXPECT_TRUE(uf.connected(0, 1));
 }
@@ -52,9 +52,9 @@ TEST(union_find, connect_connnected)
    ds::union_find uf(2);
 
    uf.connect(0, 1);
-   EXPECT_EQ(1, uf.count());
+   EXPECT_EQ(1u, uf.count());
    uf.connect(0, 1);
-   EXPECT_EQ(1, uf.count());
+   EXPECT_EQ(1u, uf.count());
 }
 
 TEST(union_find, reflexivity)
@@ -102,7 +102,7 @@ TEST(union_find, tiny)
    std::ifstream ifs(tinyTestFile);
    if (ifs.is_open()) 
    {
-      EXPECT_EQ(2, components_count(ifs));
+      EXPECT_EQ(2u, components_count(ifs));
    }
 }
 
@@ -111,7 +111,7 @@ TEST(union_find, medium)
    std::ifstream ifs(mediumTestFile);
    if (ifs.is_open()) 
    {
-      EXPECT_EQ(3, components_count(ifs));
+      EXPECT_EQ(3u, components_count(ifs));
    }
 }
 
@@ -120,7 +120,7 @@ TEST(union_find, large)
    std::ifstream ifs(largeTestFile);
    if (ifs.is_open()) 
    {
-      EXPECT_EQ(6, components_count(ifs));
+      EXPECT_EQ(6u, components_count(ifs));
    }
 }
 

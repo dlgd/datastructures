@@ -10,10 +10,10 @@ namespace ds
 template <typename IteratorType, typename LessType>
 void selection_sort(IteratorType begin, IteratorType end, LessType less)
 {
-   for (IteratorType i = begin; i != end; ++i)
+   for (auto i = begin; i != end; ++i)
    {
-      IteratorType min = i;
-      for (IteratorType j = std::next(i); j != end; ++j)
+      auto min = i;
+      for (auto j = std::next(i); j != end; ++j)
       {
          if (less(*j, *min))
             min = j;
@@ -31,9 +31,9 @@ void selection_sort(IteratorType begin, IteratorType end)
 template <typename IteratorType, typename LessType>
 void insertion_sort(IteratorType begin, IteratorType end, LessType less)
 {
-   for (IteratorType i = begin; i != end; ++i)
+   for (auto i = begin; i != end; ++i)
    {
-      for (IteratorType j = i; j != begin && less(*j, *std::prev(j)); --j)
+      for (auto j = i; j != begin && less(*j, *std::prev(j)); --j)
       {
          std::iter_swap(j, std::prev(j));
       }
@@ -46,7 +46,82 @@ void insertion_sort(IteratorType begin, IteratorType end)
    insertion_sort(begin, end, std::less<decltype(*begin)>());
 }
 
+namespace detail
+{
 
+template <typename IteratorType>
+typename std::iterator_traits<IteratorType>::difference_type
+subseq_length(IteratorType begin, IteratorType end)
+{
+   auto n = std::distance(begin, end);
+   if (n == 0)
+      return 0;
+
+   decltype(n) h = 1;
+   while (h < n / 3)
+   {
+      h = 3 * h + 1;
+   }
+   return h;
+}
+
+template <typename IteratorType, typename LessType, typename Tag>
+void shell_sort(IteratorType begin, IteratorType end, LessType less, Tag)
+{
+   for (auto h = subseq_length(begin, end); h >= 1; h /= 3)
+   {
+      const auto begin_h_dist = std::distance(begin, std::next(begin, h));
+      for (auto i = std::next(begin, h); i != end; ++i)
+      {
+         auto j = i;
+         auto pj = std::prev(j, h);
+         while (less(*j, *pj))
+         {
+            std::iter_swap(j, pj);
+            j = pj;
+
+            if (std::distance(begin, j) < begin_h_dist)
+               break;
+
+            pj = std::prev(j, h);
+         }
+      }
+   }
+}
+
+template <typename IteratorType, typename LessType>
+void shell_sort(IteratorType begin, IteratorType end, LessType less,
+                std::random_access_iterator_tag)
+{
+   for (auto h = subseq_length(begin, end); h >= 1; h /= 3)
+   {
+      for (auto i = std::next(begin, h); i != end; ++i)
+      {
+         for (auto j = i;
+              j >= std::next(begin, h) && less(*j, *std::prev(j, h));
+              j = std::prev(j, h))
+         {
+            std::iter_swap(j, std::prev(j, h));
+         }
+      }
+   }
+}
+
+}
+
+template <typename IteratorType, typename LessType>
+void shell_sort(IteratorType begin, IteratorType end, LessType less)
+{
+   using category_t =
+      typename std::iterator_traits<IteratorType>::iterator_category;
+   detail::shell_sort(begin, end, less, category_t());
+}
+
+template <typename IteratorType>
+void shell_sort(IteratorType begin, IteratorType end)
+{
+   shell_sort(begin, end, std::less<decltype(*begin)>());
+}
 
 }
 

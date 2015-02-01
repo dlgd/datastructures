@@ -1,10 +1,12 @@
-#include <ds/sort.hpp>
+#include <iostream>
 
 #include <algorithm>
 #include <iterator>
 #include <list>
 #include <string>
 #include <vector>
+
+#include <ds/sort.hpp>
 
 #include <gtest/gtest.h>
 
@@ -15,6 +17,15 @@ namespace ac = autocheck;
 namespace
 {
 
+struct selection_sort_t
+{
+   template<typename T>
+   static void apply(T begin, T end)
+   {
+      ds::selection_sort(begin, end);
+   }
+};
+
 struct insertion_sort_t
 {
    template<typename T>
@@ -24,17 +35,24 @@ struct insertion_sort_t
    }
 };
 
-struct selection_sort_t
+struct shell_sort_t
 {
    template<typename T>
    static void apply(T begin, T end)
    {
-      ds::insertion_sort(begin, end);
+      ds::shell_sort(begin, end);
    }
 };
 
-using sort_funs_t = testing::Types<insertion_sort_t, selection_sort_t>;
+using sort_funs_t = testing::Types<insertion_sort_t, selection_sort_t, shell_sort_t>;
 
+
+template <typename CtnType>
+void print_ctn(const CtnType& xs)
+{
+   std::copy(std::begin(xs), std::end(xs),
+             std::ostream_iterator<decltype(*std::begin(xs))>(std::cout, ", "));
+}
 
 template <typename SortFun, typename CtnType>
 static bool check_sort(CtnType& xs)
@@ -53,7 +71,7 @@ struct prop_sort_t
    }
 };
 
-template <typename SortFun, typename CtnType, std::size_t max_tests = 1000>
+template <typename SortFun, typename CtnType, std::size_t max_tests = 100>
 static void check_prop_sort()
 {
    ac::check<CtnType>(prop_sort_t<SortFun>(), max_tests,

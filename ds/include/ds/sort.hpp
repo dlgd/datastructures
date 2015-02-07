@@ -123,6 +123,52 @@ void shell_sort(IteratorType begin, IteratorType end)
    shell_sort(begin, end, std::less<decltype(*begin)>());
 }
 
+namespace detail
+{
+
+template <typename IteratorType, typename LessType>
+void merge(IteratorType begin, IteratorType mid, IteratorType end,
+           LessType less)
+{
+   std::vector<typename IteratorType::value_type> aux(begin, end);
+   auto m = std::next(aux.begin(), std::distance(begin, mid));
+   auto i = aux.begin(), j = m;
+
+   for (auto o = begin; o != end; ++o)
+   {
+      decltype(aux.begin()) p;
+      if (i == m)
+         p = j++;
+      else if (j == aux.end())
+         p = i++;
+      else
+         p = less(*j, *i) ? j++ : i++;
+
+      *o = *p;
+   }
+}
+
+}
+
+template <typename IteratorType, typename LessType>
+void merge_sort(IteratorType begin, IteratorType end, LessType less)
+{
+   const auto l = std::distance(begin, end);
+   if (l <= 1)
+      return;
+
+   const auto mid = std::next(begin, l / 2);
+   merge_sort(begin, mid, less);
+   merge_sort(mid, end, less);
+   detail::merge(begin, mid, end, less);
+}
+
+template <typename IteratorType>
+void merge_sort(IteratorType begin, IteratorType end)
+{
+   merge_sort(begin, end, std::less<decltype(*begin)>());
+}
+
 }
 
 #endif

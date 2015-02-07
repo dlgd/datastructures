@@ -44,7 +44,19 @@ struct shell_sort_t
    }
 };
 
-using sort_funs_t = testing::Types<insertion_sort_t, selection_sort_t, shell_sort_t>;
+
+struct merge_sort_t
+{
+   template<typename T>
+   static void apply(T begin, T end)
+   {
+      ds::merge_sort(begin, end);
+   }
+};
+
+
+using sort_funs_t = testing::Types<selection_sort_t, insertion_sort_t,
+                                   shell_sort_t, merge_sort_t>;
 
 
 template <typename CtnType>

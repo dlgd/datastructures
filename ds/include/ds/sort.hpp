@@ -2,6 +2,7 @@
 #define DATASTRUCTURES_SORT_HPP
 
 #include <algorithm>
+#include <iterator>
 #include <functional>
 
 namespace ds

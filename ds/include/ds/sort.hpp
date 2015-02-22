@@ -2,6 +2,7 @@
 #define DATASTRUCTURES_SORT_HPP
 
 #include <algorithm>
+#include <cassert>
 #include <iterator>
 #include <functional>
 
@@ -168,6 +169,59 @@ template <typename IteratorType>
 void merge_sort(IteratorType begin, IteratorType end)
 {
    merge_sort(begin, end, std::less<decltype(*begin)>());
+}
+
+namespace detail
+{
+
+template <typename IteratorType, typename LessType>
+IteratorType partition(IteratorType begin, IteratorType end, LessType less)
+{
+   assert(begin != end);
+   if (std::next(begin) == end)
+      return begin;
+
+   auto& v = *begin;
+   auto i = begin, j = end, last = std::prev(end);
+   bool crossed = false;
+   while (true)
+   {
+      do {
+         crossed |= ++i == j;
+      } while (less(*i, v) && i != last);
+
+      do {
+         crossed |= i == --j;
+      } while (less(v, *j) && j != begin);
+
+      if (crossed)
+         break;
+
+      std::iter_swap(i, j);
+   }
+
+   std::swap(v, *j);
+   return j;
+}
+
+}
+
+template <typename IteratorType, typename LessType>
+void quick_sort(IteratorType begin, IteratorType end, LessType less)
+{
+   if (begin == end)
+      return;
+
+   const auto p = detail::partition(begin, end, less);
+   assert(p != end);
+   quick_sort(begin, p, less);
+   quick_sort(std::next(p), end, less);
+}
+
+template <typename IteratorType>
+void quick_sort(IteratorType begin, IteratorType end)
+{
+   quick_sort(begin, end, std::less<decltype(*begin)>());
 }
 
 }

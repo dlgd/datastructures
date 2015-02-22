@@ -1,12 +1,11 @@
-#include <iostream>
+#include <ds/sort.hpp>
 
 #include <algorithm>
+#include <iostream>
 #include <iterator>
 #include <list>
 #include <string>
 #include <vector>
-
-#include <ds/sort.hpp>
 
 #include <gtest/gtest.h>
 
@@ -44,7 +43,6 @@ struct shell_sort_t
    }
 };
 
-
 struct merge_sort_t
 {
    template<typename T>
@@ -55,8 +53,18 @@ struct merge_sort_t
 };
 
 
+struct quick_sort_t
+{
+   template<typename T>
+   static void apply(T begin, T end)
+   {
+      ds::quick_sort(begin, end);
+   }
+};
+
+
 using sort_funs_t = testing::Types<selection_sort_t, insertion_sort_t,
-                                   shell_sort_t, merge_sort_t>;
+                                   shell_sort_t, merge_sort_t, quick_sort_t>;
 
 
 template <typename CtnType>
@@ -64,6 +72,7 @@ void print_ctn(const CtnType& xs)
 {
    std::copy(std::begin(xs), std::end(xs),
              std::ostream_iterator<decltype(*std::begin(xs))>(std::cout, ", "));
+   std::cout << std::endl;
 }
 
 template <typename SortFun, typename CtnType>
@@ -92,6 +101,12 @@ static void check_prop_sort()
 
 
 // Basic unitary tests
+
+TEST(sort_basic, quick_sort)
+{
+   std::vector<int> xs{1, -1, 1};
+   EXPECT_TRUE(check_sort<quick_sort_t>(xs));
+}
 
 template <class T>
 class sort_basic_test_t : public testing::Test

@@ -16,3 +16,9 @@ target_link_libraries (sort_test gtest_main)
 add_test(sort sort_test)
 
 
+add_executable (priority_queue_test priority_queue_test.cpp)
+target_link_libraries (priority_queue_test gtest_main)
+
+add_test(priority_queue priority_queue_test)
+
+

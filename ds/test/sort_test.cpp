@@ -63,8 +63,19 @@ struct quick_sort_t
 };
 
 
+struct heap_sort_t
+{
+   template<typename T>
+   static void apply(T begin, T end)
+   {
+      ds::heap_sort(begin, end);
+   }
+};
+
+
 using sort_funs_t = testing::Types<selection_sort_t, insertion_sort_t,
-                                   shell_sort_t, merge_sort_t, quick_sort_t>;
+                                   shell_sort_t, merge_sort_t, quick_sort_t,
+                                   heap_sort_t>;
 
 
 template <typename CtnType>
@@ -101,12 +112,6 @@ static void check_prop_sort()
 
 
 // Basic unitary tests
-
-TEST(sort_basic, quick_sort)
-{
-   std::vector<int> xs{1, -1, 1};
-   EXPECT_TRUE(check_sort<quick_sort_t>(xs));
-}
 
 template <class T>
 class sort_basic_test_t : public testing::Test

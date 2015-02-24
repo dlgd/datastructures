@@ -224,6 +224,68 @@ void quick_sort(IteratorType begin, IteratorType end)
    quick_sort(begin, end, std::less<decltype(*begin)>());
 }
 
+
+namespace detail
+{
+
+size_t child_index(size_t i)
+{
+  return 2 * (i + 1) - 1;
+}
+
+template <typename IteratorType, typename LessType>
+void sink(IteratorType begin, IteratorType end, IteratorType p, LessType less)
+{
+   const auto l = std::distance(begin, end);
+   const auto ip = std::distance(begin, p);
+   const auto ic = child_index(ip);
+   if (ic >= l)
+      return;
+
+   auto c = std::next(begin, ic);
+   auto imax_c = ic;
+   if (ic + 1 < l && less(*c, *std::next(c, 1)))
+      imax_c = ic + 1;
+
+   auto max_c = std::next(begin, imax_c);
+   if (less(*p, *max_c))
+   {
+      std::iter_swap(p, max_c);
+      sink(begin, end, max_c, less);
+   }
+}
+
+}
+
+template <typename IteratorType, typename LessType>
+void heap_sort(IteratorType begin, IteratorType end, LessType less)
+{
+   const auto l = std::distance(begin, end);
+   if (l <= 1)
+      return;
+
+   auto it = std::next(begin, l / 2 - 1);
+   do
+   {
+      detail::sink(begin, end, it, less);
+   }
+   while (it-- != begin);
+
+   it = std::prev(end);
+   do
+   {
+      std::iter_swap(begin, it);
+      detail::sink(begin, it, begin, less);
+   }
+   while (it-- != begin);
+}
+
+template <typename IteratorType>
+void heap_sort(IteratorType begin, IteratorType end)
+{
+   heap_sort(begin, end, std::less<decltype(*begin)>());
+}
+
 }
 
 #endif

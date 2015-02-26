@@ -1,6 +1,7 @@
 #include "ds/union_find.hpp"
 
 #include <algorithm>
+#include <numeric>
 
 namespace ds
 {
@@ -10,8 +11,7 @@ union_find::union_find(std::size_t size):
    m_index(size),
    m_size(size, 1)
 {
-   site_t i = 0;
-   std::generate(m_index.begin(), m_index.end(), [&i] () { return i++; });
+   std::iota(m_index.begin(), m_index.end(), 0);
 }
 
  union_find::site_t union_find::find(site_t p)

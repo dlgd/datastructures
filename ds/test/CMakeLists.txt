@@ -22,3 +22,8 @@ target_link_libraries (priority_queue_test gtest_main)
 add_test(priority_queue priority_queue_test)
 
 
+add_executable (tree_test tree_test.cpp)
+target_link_libraries (tree_test gtest_main)
+
+add_test(tree tree_test)
+

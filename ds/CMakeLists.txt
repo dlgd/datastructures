@@ -8,8 +8,11 @@ set(_SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
 include_directories(${_INCLUDE_DIR})
 
 set(PUB_HPP_FILES
-  ${_INCLUDE_DIR}/ds/union_find.hpp
+  ${_INCLUDE_DIR}/ds/bs_tree.hpp
+  ${_INCLUDE_DIR}/ds/rb_tree.hpp
   ${_INCLUDE_DIR}/ds/sort.hpp
+  ${_INCLUDE_DIR}/ds/tree.hpp
+  ${_INCLUDE_DIR}/ds/union_find.hpp
 )
 
 set(CPP_FILES

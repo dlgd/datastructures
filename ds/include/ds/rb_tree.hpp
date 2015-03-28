@@ -75,7 +75,7 @@ private:
       if (!h)
          return nb_black_links;
       return get_nb_black_links(h->m_left, is_red(h) ? 
-                                nb_black_links + 1 : nb_black_links);
+                                nb_black_links : nb_black_links + 1);
    }
 
    static bool _is_balanced(const node_ptr_t& h,

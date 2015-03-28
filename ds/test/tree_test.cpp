@@ -76,6 +76,12 @@ TEST(rb_tree, basic)
    check_get(t, -12, 13);
    check_get(t, -3, 13);
    check_get(t, 6, 23);
+
+   check_remove(t, -12);
+   check_remove(t, 1);
+   check_remove(t, -3);
+   check_remove(t, 6);
+   check_remove(t, -8);
 }
 
 

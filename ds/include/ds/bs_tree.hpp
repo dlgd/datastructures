@@ -2,6 +2,7 @@
 #define DATASTRUCTURES_BS_TREE_HPP
 
 #include <functional>
+#include <utility>
 
 #include "ds/tree.hpp"
 

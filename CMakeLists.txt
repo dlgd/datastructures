@@ -10,5 +10,6 @@ set(GTEST_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/${GTEST_DIR}/include)
 set(AUTOCHECK_DIR "autocheck")
 set(AUTOCHECK_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/${AUTOCHECK_DIR}/include)
 
+set(gtest_force_shared_crt ON)
 add_subdirectory(${GTEST_DIR})
 add_subdirectory(ds)

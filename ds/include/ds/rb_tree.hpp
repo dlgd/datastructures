@@ -104,7 +104,8 @@ private:
    {
       if (!node)
       {
-         node = node_ptr_t(new NodeType(parent, key, value, NodeType::color_t::red));
+         node = node_ptr_t(new NodeType(parent, key, value, 
+                                        NodeType::color_t::red));
          return;
       }
 	   
@@ -164,7 +165,6 @@ private:
 
       balance(h);
    }
-
 
    static void remove_min(node_ptr_t& h)
    {
@@ -236,36 +236,31 @@ private:
       return node->m_color == NodeType::color_t::red;
    }
 
-   static void rotate_right(node_ptr_t& h)
+   static void rotate(node_ptr_t& h, node_ptr_t NodeType::* src, 
+                      node_ptr_t NodeType::* dst)
    {
       auto p = h->m_parent;
-      node_ptr_t x = std::move(h->m_left);
-      h->m_left = std::move(x->m_right);
-      if (h->m_left)
-         h->m_left->m_parent = h.get();
+      node_ptr_t x = std::move((*h).*src);
+      (*h).*src = std::move((*x).*dst);
+      if ((*h).*src)
+         ((*h).*src)->m_parent = h.get();
       x->m_color = h->m_color;
       h->m_color = NodeType::color_t::red;
-      x->m_right = std::move(h);
+      (*x).*dst = std::move(h);
+      if ((*x).*dst)
+         ((*x).*dst)->m_parent = x.get();
       h = std::move(x);
       h->m_parent = p;
-      if (h->m_right)
-         h->m_right->m_parent = h.get();
+   }
+
+   static void rotate_right(node_ptr_t& h)
+   {
+      rotate(h, &NodeType::m_left, &NodeType::m_right);
    }
 
    static void rotate_left(node_ptr_t& h)
    {
-      auto p = h->m_parent;
-      node_ptr_t x = std::move(h->m_right);
-      h->m_right = std::move(x->m_left);
-      if (h->m_right)
-         h->m_right->m_parent = h.get();
-      x->m_color = h->m_color;
-      h->m_color = NodeType::color_t::red;
-      x->m_left = std::move(h);
-      h = std::move(x);
-      h->m_parent = p;
-      if (h->m_left)
-         h->m_left->m_parent = h.get();
+      rotate(h, &NodeType::m_right, &NodeType::m_left);
    }
 
    static typename NodeType::color_t 
@@ -297,7 +292,7 @@ struct rbt_node_t: public node_base_t<KeyType, ValueType,
    enum class color_t { red, black };
 
    rbt_node_t(rbt_node_t* parent, const KeyType& key, const ValueType& value, 
-              rbt_node_t::color_t color):
+              typename rbt_node_t::color_t color):
       base_t(parent, key, value),
       m_color(color)
    {}

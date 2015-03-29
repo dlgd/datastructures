@@ -23,26 +23,9 @@ struct bst_impl_t
       m_less(less)
    {}
 
-   void put(node_ptr_t& node, const key_t& key, const value_t& value) const
+   void put(node_ptr_t& root, const key_t& key, const value_t& value) const
    {
-      if (!node)
-      {
-         node = node_ptr_t(new NodeType);
-         node->m_key = key;
-         node->m_value = value;
-      }
-      else if (m_less(key, node->m_key))
-      {
-         put(node->m_left, key, value);
-      }
-      else if (m_less(node->m_key, key))
-      {
-         put(node->m_right, key, value);
-      }
-      else
-      {
-         node->m_value = value;
-      }
+      _put(root.get(), root, key, value);
    }
 
    void remove(node_ptr_t& node, const key_t& key) const
@@ -60,6 +43,27 @@ struct bst_impl_t
 
 private:
    LessType m_less;
+
+   void _put(NodeType* parent, node_ptr_t& node, const key_t& key, 
+            const value_t& value) const
+   {
+      if (!node)
+      {
+         node = node_ptr_t(new NodeType(parent, key, value));
+      }
+      else if (m_less(key, node->m_key))
+      {
+         _put(node.get(), node->m_left, key, value);
+      }
+      else if (m_less(node->m_key, key))
+      {
+         _put(node.get(), node->m_right, key, value);
+      }
+      else
+      {
+         node->m_value = value;
+      }
+   }
 
    static void remove_node(node_ptr_t& node)
    {
@@ -95,6 +99,12 @@ template <typename KeyType, typename ValueType>
 struct bst_node_t: public node_base_t<KeyType, ValueType,
                                       bst_node_t<KeyType, ValueType>>
 {
+   using base_t = node_base_t<KeyType, ValueType,
+                              bst_node_t<KeyType, ValueType>>;
+
+   bst_node_t(bst_node_t* parent, const KeyType& key, const ValueType& value):
+      base_t(parent, key, value)
+   {}
 };
 
 }

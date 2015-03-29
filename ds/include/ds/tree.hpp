@@ -21,8 +21,15 @@ struct node_trait_t
 template<typename KeyType, typename ValueType, typename NodeType>
 struct node_base_t
 {
+   node_base_t(NodeType* parent, const KeyType &key, const ValueType& value):
+      m_key(key),
+      m_value(value),
+      m_parent(parent)
+   {}
+
    KeyType m_key;
    ValueType m_value;
+   NodeType* m_parent;
    typename node_trait_t<NodeType>::ptr_t m_left;
    typename node_trait_t<NodeType>::ptr_t m_right;
 };

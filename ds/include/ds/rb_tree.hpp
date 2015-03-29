@@ -27,7 +27,7 @@ struct rbt_impl_t
    void put(node_ptr_t& root, const key_t& key, const value_t& value) const
    {
       assert(is_sound(root));
-      _put(root, key, value);
+      _put(root.get(), root, key, value);
       root->m_color = NodeType::color_t::black;
       assert(is_sound(root));
    }
@@ -62,6 +62,13 @@ private:
          return false;
       if (is_red(h) && is_red(h->m_left))
          return false;
+
+      if (h->m_left && h.get() != h->m_left->m_parent)
+         return false;
+
+      if (h->m_right && h.get() != h->m_right->m_parent)
+         return false;
+
       return is_node_sound(h->m_left) && is_node_sound(h->m_right);
    }
 
@@ -92,21 +99,19 @@ private:
          _is_balanced(h->m_right, expected_nb_black_links, nb_black_links);
    }
 
-   void _put(node_ptr_t& node, const key_t& key, const value_t& value) const
+   void _put(NodeType* parent, node_ptr_t& node, 
+             const key_t& key, const value_t& value) const
    {
       if (!node)
       {
-         node = node_ptr_t(new NodeType);
-         node->m_key = key;
-         node->m_value = value;
-         node->m_color = NodeType::color_t::red;
+         node = node_ptr_t(new NodeType(parent, key, value, NodeType::color_t::red));
          return;
       }
 	   
       if (m_less(key, node->m_key))
-         _put(node->m_left, key, value);
+         _put(node.get(), node->m_left, key, value);
       else if (m_less(node->m_key, key))
-         _put(node->m_right, key, value);
+         _put(node.get(), node->m_right, key, value);
       else
          node->m_value = value;
 
@@ -233,22 +238,34 @@ private:
 
    static void rotate_right(node_ptr_t& h)
    {
+      auto p = h->m_parent;
       node_ptr_t x = std::move(h->m_left);
       h->m_left = std::move(x->m_right);
+      if (h->m_left)
+         h->m_left->m_parent = h.get();
       x->m_color = h->m_color;
       h->m_color = NodeType::color_t::red;
       x->m_right = std::move(h);
       h = std::move(x);
+      h->m_parent = p;
+      if (h->m_right)
+         h->m_right->m_parent = h.get();
    }
 
    static void rotate_left(node_ptr_t& h)
    {
+      auto p = h->m_parent;
       node_ptr_t x = std::move(h->m_right);
       h->m_right = std::move(x->m_left);
+      if (h->m_right)
+         h->m_right->m_parent = h.get();
       x->m_color = h->m_color;
       h->m_color = NodeType::color_t::red;
       x->m_left = std::move(h);
       h = std::move(x);
+      h->m_parent = p;
+      if (h->m_left)
+         h->m_left->m_parent = h.get();
    }
 
    static typename NodeType::color_t 
@@ -274,7 +291,17 @@ template <typename KeyType, typename ValueType>
 struct rbt_node_t: public node_base_t<KeyType, ValueType,
                                       rbt_node_t<KeyType, ValueType>>
 {
+   using base_t = node_base_t<KeyType, ValueType,
+                              rbt_node_t<KeyType, ValueType>>;
+
    enum class color_t { red, black };
+
+   rbt_node_t(rbt_node_t* parent, const KeyType& key, const ValueType& value, 
+              rbt_node_t::color_t color):
+      base_t(parent, key, value),
+      m_color(color)
+   {}
+
    color_t m_color = color_t::red;
 };
 
